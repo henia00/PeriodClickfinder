@@ -85,13 +85,13 @@ class PeriodClickfinder:
         self.toolbar2 = NavigationToolbar2Tk(self.canvas2, center_frame)
         self.toolbar2.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.fig3, self.ax3 = plt.subplots(figsize=(4, 4), tight_layout=True)
+        self.fig3, self.ax3 = plt.subplots(figsize=(4, 3), tight_layout=True)
         self.canvas3 = FigureCanvasTkAgg(self.fig3, master=right_frame)
         self.canvas3.get_tk_widget().pack(side=tk.TOP, fill=tk.X, expand=1)
         self.toolbar3 = NavigationToolbar2Tk(self.canvas3, right_frame)
         self.toolbar3.pack(side=tk.TOP, fill=tk.X)
 
-        self.output_text = tk.Text(right_frame, height=22, width=40)
+        self.output_text = tk.Text(right_frame, height=25, width=40)
         self.output_text.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1, pady=10)
 
         self.canvas1.mpl_connect('button_press_event', self.on_lsc_click)
@@ -101,7 +101,7 @@ class PeriodClickfinder:
 
     def save_output(self):
         with open(self.file_name+'_fit', 'w') as f:
-            f.write("# A0 \n")
+            f.write("# A0 A0_err \n")
             f.write(f"{self.result[0]} {self.errors[0]}\n")
             f.write("# Frequency \t Freq_error \t Amplitude \t Amp_error \t T0 \t T0_error \n")
             for i in range(1, self.nharm * 3, 3):
@@ -352,17 +352,23 @@ class PeriodClickfinder:
         self.plot_fit()
 
     def plot_fit(self):
-        epoch = 0
+        # epoch = 0
         fit = self.sum_sines(self.data_orig[:, 0], self.result)
-        phases = ((np.array(self.data_orig[:, 0]) - epoch) / (1./self.result[1])) % 1.0
-        sorted_idx = np.argsort(phases)
+        # phases = ((np.array(self.data_orig[:, 0]) - epoch) / (1./self.result[1])) % 1.0
+        # sorted_idx = np.argsort(phases)
+        # self.ax3.clear()
+        # self.ax3.invert_yaxis()
+        # self.ax3.set_title("Phased")
+        # self.ax3.scatter(phases, self.data_orig[:, 1], color='blue')
+        # self.ax3.scatter(phases+1, self.data_orig[:, 1], color='blue')
+        # self.ax3.plot(phases[sorted_idx], fit[sorted_idx], c='red')
+        # self.ax3.plot(phases[sorted_idx] + 1, fit[sorted_idx], c='red')
+        # self.canvas3.draw()
         self.ax3.clear()
+        self.ax3.set_title("Data")
         self.ax3.invert_yaxis()
-        self.ax3.set_title("Phased")
-        self.ax3.scatter(phases, self.data_orig[:, 1], color='blue')
-        self.ax3.scatter(phases+1, self.data_orig[:, 1], color='blue')
-        self.ax3.plot(phases[sorted_idx], fit[sorted_idx], c='red')
-        self.ax3.plot(phases[sorted_idx] + 1, fit[sorted_idx], c='red')
+        self.ax3.scatter(self.data_orig[:, 0], self.data_orig[:, 1], c='blue')
+        self.ax3.plot(self.data_orig[:, 0], fit, c='red')
         self.canvas3.draw()
 
     def on_pdm_click(self, event):
