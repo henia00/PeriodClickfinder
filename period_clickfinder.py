@@ -85,11 +85,13 @@ class PeriodClickfinder:
         self.toolbar2 = NavigationToolbar2Tk(self.canvas2, center_frame)
         self.toolbar2.pack(side=tk.BOTTOM, fill=tk.X)
 
-        self.fig3, self.ax3 = plt.subplots(figsize=(4, 3), tight_layout=True)
+        self.fig3, self.ax3 = plt.subplots(figsize=(4, 4), tight_layout=True)
         self.canvas3 = FigureCanvasTkAgg(self.fig3, master=right_frame)
         self.canvas3.get_tk_widget().pack(side=tk.TOP, fill=tk.X, expand=1)
+        self.toolbar3 = NavigationToolbar2Tk(self.canvas3, right_frame)
+        self.toolbar3.pack(side=tk.TOP, fill=tk.X)
 
-        self.output_text = tk.Text(right_frame, height=20, width=40)
+        self.output_text = tk.Text(right_frame, height=22, width=40)
         self.output_text.pack(side=tk.BOTTOM, fill=tk.BOTH, expand=1, pady=10)
 
         self.canvas1.mpl_connect('button_press_event', self.on_lsc_click)
