@@ -8,6 +8,7 @@ from astropy.timeseries import LombScargle
 from PyAstronomy.pyTiming import pyPDM
 import scipy.optimize
 
+
 class PeriodClickfinder:
 
     max_freq = 1
@@ -29,14 +30,14 @@ class PeriodClickfinder:
         self.root.title("Period Clickfinder")
         self.root.geometry()
 
-        # Create left frame for buttons
+        # Left frame for buttons
         left_frame = ttk.Frame(root, padding="10")
         left_frame.grid(row=0, column=0, sticky="nsew")
 
-        left_miniframe = ttk.Frame(left_frame, padding = 10)
-        left_miniframe.grid(row = 6, column = 0, sticky = "nsew")
+        left_miniframe = ttk.Frame(left_frame, padding=10)
+        left_miniframe.grid(row=6, column=0, sticky="nsew")
 
-        # Create buttons
+        # Buttons
         load_data_button = tk.Button(left_frame, text="Load data", command=self.load_data)
         periodogram_button = tk.Button(left_frame, text="Calculate periodogram",
                                        command=self.periodogram)
@@ -47,32 +48,32 @@ class PeriodClickfinder:
                                             command=self.restore_original)
         save_button = tk.Button(left_frame, text='Save', command=self.save_output)
 
-        wide_button = tk.Button(left_miniframe, text = 'Wide', command = lambda *args:
-                      self.set_width_of_click(35))
-        middle_button = tk.Button(left_miniframe, text = 'Middle', command = lambda *args:
-                      self.set_width_of_click(10))
-        narrow_button = tk.Button(left_miniframe, text = 'Narrow', command = lambda *args:
-                      self.set_width_of_click(1))
+        wide_button = tk.Button(left_miniframe, text='Wide', command=lambda *args:
+                                self.set_width_of_click(35))
+        middle_button = tk.Button(left_miniframe, text='Middle', command=lambda *args:
+                                  self.set_width_of_click(10))
+        narrow_button = tk.Button(left_miniframe, text='Narrow', command=lambda *args:
+                                  self.set_width_of_click(1))
 
-        # Arrange buttons vertically
+        # Arrange buttons
         load_data_button.grid(row=0, column=0, sticky="ew", pady=5)
         periodogram_button.grid(row=1, column=0, sticky="ew", pady=5)
         show_frequency_list_button.grid(row=2, column=0, sticky="ew", pady=5)
         fit_button.grid(row=3, column=0, sticky="ew", pady=5)
         restore_original_button.grid(row=4, column=0, sticky="ew", pady=5)
         save_button.grid(row=5, column=0, sticky="ew", pady=5)
-        wide_button.grid(row = 0, column = 0)
-        middle_button.grid(row = 0, column = 1)
-        narrow_button.grid(row = 0, column = 2)
+        wide_button.grid(row=0, column=0)
+        middle_button.grid(row=0, column=1)
+        narrow_button.grid(row=0, column=2)
 
-        # Create right frame for Matplotlib plots
+        # Right frame for Matplotlib plots
         center_frame = ttk.Frame(root, padding="10")
         center_frame.grid(row=0, column=1, sticky="nsew")
 
         right_frame = ttk.Frame(root, padding="10")
         right_frame.grid(row=0, column=2, sticky="nsew")
 
-        # Create Matplotlib figures and canvas
+        # Matplotlib plots
         self.fig1, self.ax1 = plt.subplots(figsize=(6, 4), tight_layout=True)
         self.canvas1 = FigureCanvasTkAgg(self.fig1, master=center_frame)
         self.canvas1.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1, pady=10)
@@ -131,7 +132,6 @@ class PeriodClickfinder:
         self.calculate_pdm()
 
     def load_data(self):
-        # DO ZROBIENIA: teraz jak laduje dane to nie usuwa obrazkow, trzeba wyzerowac
         self.removed = []
         file_path = filedialog.askopenfilename(title="Select a file",
                                                filetypes=[("Data files", "*_data"),
@@ -141,7 +141,6 @@ class PeriodClickfinder:
             self.data = np.loadtxt(file_path)
             self.data_orig = self.data.copy()
             self.file_name = os.path.basename(file_path)
-            # self.original_data = np.loadtxt(file_path)
             self.root.title("Period Clickfinder: "+self.file_name)
             self.write_output(f"Data file {self.file_name} loaded")
             self.plot_data()
@@ -216,11 +215,9 @@ class PeriodClickfinder:
     def plot_lsc(self):
         self.ax1.clear()
 
-        # Calculate moving average
         window_size = 101
         moving_average = np.convolve(self.PS, np.ones(window_size) / window_size, mode='valid')
 
-        # Expand moving average array to match the length of self.PS
         moving_average = np.concatenate((np.full(window_size - 1, np.nan), moving_average))
 
         self.ax1.plot(self.frq, self.PS)
@@ -277,7 +274,6 @@ class PeriodClickfinder:
         self.frequency_window = tk.Toplevel(root)
         self.frequency_window.title("Frequency list")
 
-        # Create a button in the new window
         button_in_frequency_window = tk.Button(self.frequency_window, text="Clear frequency list",
                                                command=self.clear_frequency_list)
         button_in_frequency_window.pack()
@@ -343,8 +339,6 @@ class PeriodClickfinder:
         print('Getting residuals')
         self.resids = self.data_orig[:, 1] - self.sum_sines(self.data_orig[:, 0], self.result)
         self.data[:, 1] = self.resids
-        # self.data[:, 1] = np.sqrt(self.resids ** 2 / self.data_orig[:, 2] ** 2)
-
 
         self.update_frequency_list()
         self.calculate_lsc()
@@ -352,18 +346,7 @@ class PeriodClickfinder:
         self.plot_fit()
 
     def plot_fit(self):
-        # epoch = 0
         fit = self.sum_sines(self.data_orig[:, 0], self.result)
-        # phases = ((np.array(self.data_orig[:, 0]) - epoch) / (1./self.result[1])) % 1.0
-        # sorted_idx = np.argsort(phases)
-        # self.ax3.clear()
-        # self.ax3.invert_yaxis()
-        # self.ax3.set_title("Phased")
-        # self.ax3.scatter(phases, self.data_orig[:, 1], color='blue')
-        # self.ax3.scatter(phases+1, self.data_orig[:, 1], color='blue')
-        # self.ax3.plot(phases[sorted_idx], fit[sorted_idx], c='red')
-        # self.ax3.plot(phases[sorted_idx] + 1, fit[sorted_idx], c='red')
-        # self.canvas3.draw()
         self.ax3.clear()
         self.ax3.set_title("Data")
         self.ax3.invert_yaxis()
