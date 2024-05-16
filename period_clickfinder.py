@@ -1,3 +1,4 @@
+import sys
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
@@ -29,6 +30,8 @@ class PeriodClickfinder:
         self.root = root
         self.root.title("Period Clickfinder")
         self.root.geometry()
+
+
 
         # Left frame for buttons
         left_frame = ttk.Frame(root, padding="10")
@@ -100,6 +103,28 @@ class PeriodClickfinder:
 
         self.nharm = 0
 
+        if len(sys.argv) == 2:
+            if "=" not in sys.argv[1]:
+                file_path = sys.argv[1]
+                if file_path:
+                    self.file_name = os.path.basename(file_path)
+                    self.load_data(from_cli=True, filepath=file_path)
+            if "=" in sys.argv[1]:
+                self.out_path = sys.argv[1].split("=")[1]
+
+        if len(sys.argv) == 3:
+            for arg in sys.argv[1:]:
+                print(arg)
+                if "=" not in arg:
+                    print('should be file path')
+                    file_path = arg
+                    if file_path:
+                        self.file_name = os.path.basename(file_path, filepath=file_path)
+                        self.load_data(from_cli=True)
+                if "=" in arg:
+                    print('should be out file')
+                    self.out_path = arg.split("=")[1]
+
     def save_output(self):
         with open(self.file_name+'_fit', 'w') as f:
             f.write("# A0 A0_err \n")
@@ -131,12 +156,15 @@ class PeriodClickfinder:
         self.calculate_lsc()     
         self.calculate_pdm()
 
-    def load_data(self):
+    def load_data(self, from_cli=False, filepath=''):
         self.removed = []
-        file_path = filedialog.askopenfilename(title="Select a file",
-                                               filetypes=[("Data files", "*_data"),
-                                                          ("All files", "*.*")])
-        self.file_name = os.path.basename(file_path)
+        if from_cli:
+            file_path = filepath
+        if not from_cli:
+            file_path = filedialog.askopenfilename(title="Select a file",
+                                                   filetypes=[("Data files", "*_data"),
+                                                              ("All files", "*.*")])
+            self.file_name = os.path.basename(file_path)
         if file_path:
             self.data = np.loadtxt(file_path)
             self.data_orig = self.data.copy()
@@ -205,8 +233,12 @@ class PeriodClickfinder:
         return y
     
     def calculate_lsc(self):
-        self.PS = LombScargle(self.data[:, 0], self.data[:, 1], self.data[:, 2], fit_mean=True)\
-            .power(self.frq)
+        if len(self.data[0, :]) > 2:
+            self.PS = LombScargle(self.data[:, 0], self.data[:, 1], self.data[:, 2], fit_mean=True)\
+                .power(self.frq)
+        else:
+            self.PS = LombScargle(self.data[:, 0], self.data[:, 1], fit_mean=True) \
+                .power(self.frq)
         if (self.data == self.data_orig).all():
             self.PS_first = self.PS
         self.write_output(f"Found periodicity (LS): {1. / self.frq[np.argmax(self.PS)]}")
