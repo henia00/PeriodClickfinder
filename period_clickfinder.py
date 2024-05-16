@@ -169,7 +169,7 @@ class PeriodClickfinder:
             file_path = filedialog.askopenfilename(title="Select a file",
                                                    filetypes=[("Data files", "*_data"),
                                                               ("All files", "*.*")])
-            self.file_name = os.path.basename(file_path)
+        self.file_name = os.path.basename(file_path)
         if file_path:
             self.data = np.loadtxt(file_path)
             self.data_orig = self.data.copy()
@@ -383,6 +383,13 @@ class PeriodClickfinder:
         self.errors = np.sqrt(np.diag(pcov))
         print("RESULT: ", self.result)
         print("ERRORS: ", self.errors)
+
+        self.write_output("# A0 A0_err")
+        self.write_output(f"{self.result[0]} {self.errors[0]}")
+        for i in range(1, self.nharm * 3, 3):
+            self.write_output("f \t f_err \t A \t A_err \t T0 \t T0_err")
+            self.write_output(f"{round(self.result[i],7)}\t{round(self.errors[i],5)}\t{round(self.result[i + 1],7)}\t"
+                          f"{round(self.errors[i + 1],5)}\t{round(self.result[i + 2],3)}\t{round(self.errors[i + 2],3)}\n")
 
         print('Getting residuals')
         self.resids = self.data_orig[:, 1] - self.sum_sines(self.data_orig[:, 0], self.result)
