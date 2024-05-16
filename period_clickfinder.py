@@ -183,6 +183,12 @@ class PeriodClickfinder:
         self.data = self.data_orig.copy()
         self.nharm = 0
         self.frequency_list = []
+        self.ax1.clear()
+        self.canvas1.draw()
+        self.ax2.clear()
+        self.canvas2.draw()
+        self.ax3.clear()
+        self.canvas3.draw()
 
     def nyquist(self):
         """
