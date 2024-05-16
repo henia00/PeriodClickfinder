@@ -416,7 +416,7 @@ class PeriodClickfinder:
                 lowest_point_index = valid_indices[lowest_point_flattened_index]
 
                 self.write_output(f"Frequency: {self.freq[lowest_point_index]}")
-                self.write_output(f"Periodicity: {1./self.frq[highest_point_index]}")
+                self.write_output(f"Periodicity: {1./self.frq[lowest_point_index]}")
                 self.write_output(f"Power Spectrum Value: {self.t1[lowest_point_index]}")
             else:
                 self.write_output("No local maximum found in the specified frequency range.")
@@ -459,7 +459,7 @@ class PeriodClickfinder:
         self.ax2.plot(self.freq, self.t1)
         if self.frequency_list:
             for freq in self.frequency_list:
-                self.ax1.axvline(float(freq[0]), linestyle='dotted', c='green')
+                self.ax2.axvline(float(freq[0]), linestyle='dotted', c='green')
         self.ax2.set_title("Period Dispersion Minimization")
         self.ax2.set_xlim(self.ax2.get_xlim()[0], self.ax2.get_xlim()[1])
         self.ax2.set_ylim(self.ax2.get_ylim()[0], self.ax2.get_ylim()[1])
