@@ -25,12 +25,12 @@ class PeriodClickfinder:
     nharm = 0
     removed = []
     width = 35
+    xaxis = 'freq'
 
     def __init__(self, root):
         self.root = root
         self.root.title("Period Clickfinder")
         self.root.geometry()
-
 
 
         # Left frame for buttons
@@ -39,6 +39,9 @@ class PeriodClickfinder:
 
         left_miniframe = ttk.Frame(left_frame, padding=10)
         left_miniframe.grid(row=6, column=0, sticky="nsew")
+
+        left_miniframe2 = ttk.Frame(left_frame, padding=10)
+        left_miniframe2.grid(row=7, column=0, sticky="nsew")
 
         # Buttons
         load_data_button = tk.Button(left_frame, text="Load data", command=self.load_data)
@@ -58,6 +61,12 @@ class PeriodClickfinder:
         narrow_button = tk.Button(left_miniframe, text='Narrow', command=lambda *args:
                                   self.set_width_of_click(1))
 
+        freq_button = tk.Button(left_miniframe2, text='frequency', command=lambda *args:
+                                self.set_xaxis('freq'))
+        period_button = tk.Button(left_miniframe2, text='period', command=lambda *args:
+                                  self.set_xaxis('per'))
+
+
         # Arrange buttons
         load_data_button.grid(row=0, column=0, sticky="ew", pady=5)
         periodogram_button.grid(row=1, column=0, sticky="ew", pady=5)
@@ -68,6 +77,8 @@ class PeriodClickfinder:
         wide_button.grid(row=0, column=0)
         middle_button.grid(row=0, column=1)
         narrow_button.grid(row=0, column=2)
+        freq_button.grid(row=0, column=0, sticky='news', pady=5)
+        period_button.grid(row=0, column=1, sticky='news', pady=5)
 
         # Right frame for Matplotlib plots
         center_frame = ttk.Frame(root, padding="10")
@@ -144,6 +155,9 @@ class PeriodClickfinder:
 
     def set_width_of_click(self, value):
         self.width = value
+
+    def set_xaxis(self, option: str) -> None:
+        self.xaxis = option
 
     @staticmethod
     def write_fs(filename, data1, data2):
@@ -279,6 +293,7 @@ class PeriodClickfinder:
                 highest_point_index = valid_indices[highest_point_flattened_index]
 
                 self.write_output(f"Frequency: {self.frq[highest_point_index]}")
+                self.write_output(f"Periodicity: {1./self.frq[highest_point_index]}")
                 self.write_output(f"Power Spectrum Value: {self.PS[highest_point_index]}")
             else:
                 self.write_output("No local maximum found in the specified frequency range.")
@@ -325,7 +340,7 @@ class PeriodClickfinder:
                                           command=lambda number=which_freq:
                                           self.delete_frequency(number))
                 delete_button.pack(side='left')
-                text_label = tk.Label(entry_frame, text=str(entry))
+                text_label = tk.Label(entry_frame, text=f'P={round(1./float(entry[0]),5)} '+str(entry))
                 text_label.pack(side='right')
 
         else:
@@ -406,6 +421,7 @@ class PeriodClickfinder:
                 lowest_point_index = valid_indices[lowest_point_flattened_index]
 
                 self.write_output(f"Frequency: {self.freq[lowest_point_index]}")
+                self.write_output(f"Periodicity: {1./self.frq[highest_point_index]}")
                 self.write_output(f"Power Spectrum Value: {self.t1[lowest_point_index]}")
             else:
                 self.write_output("No local maximum found in the specified frequency range.")
