@@ -40,9 +40,6 @@ class PeriodClickfinder:
         left_miniframe = ttk.Frame(left_frame, padding=10)
         left_miniframe.grid(row=6, column=0, sticky="nsew")
 
-        left_miniframe2 = ttk.Frame(left_frame, padding=10)
-        left_miniframe2.grid(row=7, column=0, sticky="nsew")
-
         # Buttons
         load_data_button = tk.Button(left_frame, text="Load data", command=self.load_data)
         periodogram_button = tk.Button(left_frame, text="Calculate periodogram",
@@ -61,10 +58,6 @@ class PeriodClickfinder:
         narrow_button = tk.Button(left_miniframe, text='Narrow', command=lambda *args:
                                   self.set_width_of_click(1))
 
-        freq_button = tk.Button(left_miniframe2, text='frequency', command=lambda *args:
-                                self.set_xaxis('freq'))
-        period_button = tk.Button(left_miniframe2, text='period', command=lambda *args:
-                                  self.set_xaxis('per'))
 
 
         # Arrange buttons
@@ -77,8 +70,6 @@ class PeriodClickfinder:
         wide_button.grid(row=0, column=0)
         middle_button.grid(row=0, column=1)
         narrow_button.grid(row=0, column=2)
-        freq_button.grid(row=0, column=0, sticky='news', pady=5)
-        period_button.grid(row=0, column=1, sticky='news', pady=5)
 
         # Right frame for Matplotlib plots
         center_frame = ttk.Frame(root, padding="10")
@@ -203,6 +194,7 @@ class PeriodClickfinder:
         self.canvas2.draw()
         self.ax3.clear()
         self.canvas3.draw()
+        self.plot_data()
 
     def nyquist(self):
         """
@@ -275,6 +267,9 @@ class PeriodClickfinder:
         self.ax1.plot(self.frq, self.PS)
         self.ax1.plot(np.roll(self.frq, int((window_size - 1) / 2)), 4. * moving_average,
                       label='Moving Average', linestyle='--', color='red')
+        if self.frequency_list:
+            for freq in self.frequency_list:
+                self.ax1.axvline(float(freq[0]), linestyle='dotted', c='green')
         self.ax1.set_title("Lomb-Scargle Periodogram")
         self.ax1.set_xlim(self.ax1.get_xlim()[0], self.ax1.get_xlim()[1])
         self.ax1.set_ylim(self.ax1.get_ylim()[0], self.ax1.get_ylim()[1])
@@ -462,6 +457,9 @@ class PeriodClickfinder:
     def plot_pdm(self):
         self.ax2.clear()
         self.ax2.plot(self.freq, self.t1)
+        if self.frequency_list:
+            for freq in self.frequency_list:
+                self.ax1.axvline(float(freq[0]), linestyle='dotted', c='green')
         self.ax2.set_title("Period Dispersion Minimization")
         self.ax2.set_xlim(self.ax2.get_xlim()[0], self.ax2.get_xlim()[1])
         self.ax2.set_ylim(self.ax2.get_ylim()[0], self.ax2.get_ylim()[1])
