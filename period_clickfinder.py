@@ -225,6 +225,22 @@ class PeriodClickfinder:
         self.ax3.scatter(phases + 1, self.data[:, 1], color='blue')
         self.canvas3.draw()
 
+    def plot_phased_popup(self, which_freq: int) -> None:
+        popup = tk.Toplevel()
+        self.fig4, self.ax4 = plt.subplots(figsize=(6, 4), tight_layout=True)
+        self.canvas4 = FigureCanvasTkAgg(self.fig4, master=popup)
+        self.canvas4.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1, pady=10)
+        epoch = 0
+        print(self.frequency_list[which_freq][0])
+        phases = ((np.array(self.data_orig[:, 0]) - self.frequency_list[which_freq][2]) /
+                  (1. / self.frequency_list[which_freq][0])) % 1.0
+        # self.ax4.clear()
+        self.ax4.set_title("Phased")
+        self.ax4.invert_yaxis()
+        self.ax4.scatter(phases, self.data_orig[:, 1], color='blue')
+        self.ax4.scatter(phases + 1, self.data_orig[:, 1], color='blue')
+        self.canvas4.draw()
+
     def sum_sines(self, time, *params):
         # print('NEW RUN')
         if isinstance(params[0], np.ndarray):
@@ -335,6 +351,10 @@ class PeriodClickfinder:
                                           command=lambda number=which_freq:
                                           self.delete_frequency(number))
                 delete_button.pack(side='left')
+                phase_freq_button = tk.Button(entry_frame, text="Phase with",
+                                              command=lambda number=which_freq:
+                                              self.plot_phased_popup(number))
+                phase_freq_button.pack(side='left')
                 text_label = tk.Label(entry_frame, text=f'P={round(1./float(entry[0]),5)} '+str(entry))
                 text_label.pack(side='right')
 
